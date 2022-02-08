@@ -9,7 +9,8 @@ class TaskController {
   }
 
   async getListTasks(req, res) {
-    const { all } = req.query;
+    // const { all } = req.query;
+    const all = req.query;
     const { listId } = req.params;
     const task = await taskModel.getListTasks(listId, all);
 

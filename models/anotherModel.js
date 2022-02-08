@@ -2,26 +2,48 @@ const db = require("../db");
 
 class anotherModel {
   async dashboard() {
-    const counted = await db.query(
-      "select count(id) from tasks where done = false and due_data <= current_date"
-    );
+    const today = new Date();
+    const counted = await db
+      .select(db.raw("count(id)::integer"))
+      .from("tasks")
+      .where({ done: false, due_data: today });
 
-    const result = Number(counted.rows[0].count);
+    const result = counted[0].count;
 
-    const task = await db.query(
-      "select lists.name, lists.list_id, cast(count(done) as int) from tasks right join lists on tasks.list_id = lists.list_id GROUP BY lists.name, lists.list_id, done HAVING done=false OR done is null;"
-    );
+    const task = await db
+      .select("lists.name", "lists.list_id", db.raw("count(done)::integer"))
+      .from("tasks")
+      .rightJoin("lists", "lists.list_id", "tasks.list_id")
+      .groupBy("lists.name", "lists.list_id", "done")
+      .where("done", false)
+      .orWhere("done", null);
 
-    const dashboardRes = { count: result, tasks: task.rows };
+    const dashboardRes = { count: result, tasks: task };
 
     return dashboardRes;
   }
 
   async collection() {
-    const task = await db.query(
-      "select tasks.title, tasks.done, tasks.id, tasks.due_data, tasks.list_id, lists.name from lists right join tasks on lists.list_id = tasks.list_id group by lists.name, tasks.title, tasks.done, tasks.id, tasks.list_id, tasks.due_data having due_data = current_date"
-    );
-    return task.rows;
+    const today = new Date();
+    const task = await db
+      .select(
+        "tasks.title",
+        "tasks.done",
+        "tasks.id",
+        "tasks.due_data",
+        "lists.name"
+      )
+      .from("tasks")
+      .rightJoin("lists", "lists.list_id", "tasks.list_id")
+      .groupBy(
+        "lists.name",
+        "tasks.title",
+        "tasks.done",
+        "tasks.id",
+        "tasks.due_data"
+      )
+      .where({ "tasks.due_data": today, "tasks.done": false });
+    return task;
   }
 }
 

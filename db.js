@@ -1,5 +1,12 @@
-const Pool = require("pg").Pool;
-const pool = new Pool({
+const knex = require("knex")({
+  client: "pg",
+  connection: {
+    user: "szpaku",
+    password: "Windranger123",
+    host: "localhost",
+    post: 5432,
+    database: "incamp",
+  },
 });
 
-module.exports = pool;
+module.exports = knex;
