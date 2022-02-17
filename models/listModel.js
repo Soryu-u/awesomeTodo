@@ -13,11 +13,7 @@ class listModel {
       const task = await db("tasks").where("list_id", list_id).select("*");
       if (task[0]) {
         return task;
-      } else {
-        return "List is empty";
       }
-    } else {
-      return "List not found";
     }
   }
 
@@ -38,8 +34,6 @@ class listModel {
       .returning("*");
     if (list[0]) {
       return list;
-    } else {
-      return "List not found";
     }
   }
 
@@ -51,8 +45,6 @@ class listModel {
       const list = await db("lists").insert({ name: titleName }).returning("*");
 
       return list[0];
-    } else {
-      return "List not found";
     }
   }
 
@@ -61,9 +53,6 @@ class listModel {
     if (list[0]) {
       await db("tasks").where("list_id", list_id).del();
       await db("lists").where("list_id", list_id).del();
-      return `List ${list_id} has been deleted!`;
-    } else {
-      return "list not found";
     }
   }
 }

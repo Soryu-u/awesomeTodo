@@ -10,8 +10,6 @@ class taskModel {
     const task = await db("tasks").where("id", id).select("*");
     if (task[0]) {
       return task;
-    } else {
-      return "Task not found";
     }
   }
 
@@ -21,8 +19,6 @@ class taskModel {
       .select("*");
     if (task[0]) {
       return task;
-    } else {
-      return "Task not found";
     }
   }
 
@@ -34,8 +30,6 @@ class taskModel {
         .select("*");
       if (allListTasks[0]) {
         return allListTasks;
-      } else {
-        return "Tasks not found.";
       }
     } else {
       const falseTask = await db("tasks")
@@ -43,8 +37,6 @@ class taskModel {
         .select("*");
       if (falseTask[0]) {
         return falseTask;
-      } else {
-        return "Tasks not found.";
       }
     }
   }
@@ -52,9 +44,10 @@ class taskModel {
   async createTask(data, listId) {
     const task = db("tasks")
       .insert({
-        title: data.title ? data.title : "Без названия",
-        done: data.done !== undefined ? data.done : false,
-        due_data: data.due_data !== undefined ? data.due_data : new Date(),
+        title: data.title,
+        done: false,
+        due_date: data.due_date,
+        description: data.description,
         list_id: listId,
       })
       .returning("*");
@@ -68,31 +61,25 @@ class taskModel {
       .select("*");
     if (task[0]) {
       await db("tasks").where({ list_id: listId, id: taskId }).del();
-      return `Task ${id} has been deleted!`;
-    } else {
-      return "Task not found";
     }
   }
 
   async updateTask(taskId, listId, data) {
-    const oldTask = await db("tasks")
-      .where({ list_id: listId, id: taskId })
-      .select("*");
+    const oldTask = await db("tasks").where({ id: taskId }).select("*");
 
     if (oldTask[0]) {
       const newTask = db("tasks")
         .update({
-          title: data.title ? data.title : "Без названия",
-          done: data.done !== undefined ? data.done : false,
-          due_data: data.due_data !== undefined ? data.due_data : new Date(),
+          title: data.title,
+          done: data.done,
+          due_date: data.due_date !== undefined ? data.due_date : new Date(),
+          description: data.description,
           list_id: listId,
         })
         .where("id", taskId)
         .returning("*");
 
       return newTask;
-    } else {
-      return "Task not found";
     }
   }
 
@@ -106,13 +93,11 @@ class taskModel {
         .insert({
           title: data.title ? data.title : "Без названия",
           done: data.done !== undefined ? data.done : false,
-          due_data: data.due_data !== undefined ? data.due_data : new Date(),
+          due_date: data.due_date !== undefined ? data.due_date : new Date(),
           list_id: listId,
         })
         .returning("*");
       return newTask;
-    } else {
-      return "Task not found";
     }
   }
 }

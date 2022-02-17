@@ -6,7 +6,7 @@ class anotherModel {
     const counted = await db
       .select(db.raw("count(id)::integer"))
       .from("tasks")
-      .where({ done: false, due_data: today });
+      .where({ done: false, due_date: today });
 
     const result = counted[0].count;
 
@@ -30,7 +30,7 @@ class anotherModel {
         "tasks.title",
         "tasks.done",
         "tasks.id",
-        "tasks.due_data",
+        "tasks.due_date",
         "lists.name"
       )
       .from("tasks")
@@ -40,9 +40,9 @@ class anotherModel {
         "tasks.title",
         "tasks.done",
         "tasks.id",
-        "tasks.due_data"
+        "tasks.due_date"
       )
-      .where({ "tasks.due_data": today, "tasks.done": false });
+      .where({ "tasks.due_date": today, "tasks.done": false });
     return task;
   }
 }
